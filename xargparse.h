@@ -335,7 +335,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 
 
 /* parser state machine */
-#define xap_parser_fsm(arguments) \
+#define xap_parser_fsm(arguments, required) \
 	enum state { \
 		arguments(xap_derive_state_name_comma) \
 		NEXT_ARG, \
@@ -366,7 +366,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 	xap_declare_parser(name, struct_type) \
 	{ \
 		xap_parser_vars(arguments, stop_after, required); \
-		xap_parser_fsm(arguments); \
+		xap_parser_fsm(arguments, required); \
 		return ctx; \
 	}
 
@@ -391,18 +391,31 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 #define xap_derive_argument_usage(sopt, lopt, type, name, arry, conv) \
 	id = xap_derive_id(sopt, lopt); \
 	is_required = false; \
-	required(xap_derive_update_is_required) \
-	display_name = #name #arry; \
-	display_hints(xap_derive_update_display_name) \
+	for (int i = 0; !is_required && i < n_required_ids; i++) \
+		is_required = required_ids[i] == id; \
+	display_name = get_name(id); \
+	if (display_name == NULL) display_name = #name #arry; \
 	space = display_name[0] == '\0' ? "" : " "; \
 	xap_derive_argument_usage_print(sopt, lopt, type, name, arry, conv)
 
 #define xap_declare_fprint_usage(name) \
 	int name(FILE * stream)
 
+#define xap_derive_return_name(sopt, lopt, disp, desc) \
+	if (id == xap_derive_id(sopt, lopt)) return disp;
+
 #define xap_define_fprint_usage(name, arguments, required, display_hints) \
+	char * xap_get_name_ ## name(int id) \
+	{ \
+		display_hints(xap_derive_return_name) \
+		return NULL; \
+	} \
+	\
 	xap_declare_fprint_usage(name) \
 	{ \
+		char * (*get_name)(int) = xap_get_name_ ## name; \
+		const int n_required_ids = xap_count(required); \
+		const int required_ids[xap_count(required)] = xap_ids(required); \
 		bool is_required; \
 		int cnt = 0, id; \
 		char * display_name, * space; \
@@ -416,9 +429,9 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 #define xap_derive_fprint_positional_help(sopt, lopt, type, name, arry, conv) \
 	if (!lopt) { \
 		int id = xap_derive_id(sopt, lopt); \
-		char * desc = xap_get_desc(id); \
+		char * desc = get_desc(id); \
 		if (desc != NULL && desc[0] != '\0') { \
-			char * disp = xap_get_disp(id); \
+			char * disp = get_disp(id); \
 			cnt += fprintf(stream, "  %-20s %s\n", disp, desc); \
 		} \
 	};
@@ -426,9 +439,9 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 #define xap_derive_fprint_keyword_help(sopt, lopt, type, name, arry, conv) \
 	if (lopt) { \
 		int id = xap_derive_id(sopt, lopt); \
-		char * desc = xap_get_desc(id); \
+		char * desc = get_desc(id); \
 		if (desc != NULL && desc[0] != '\0') { \
-			char * disp = xap_get_disp(id); \
+			char * disp = get_disp(id); \
 			int n = 0; \
 			n += fprintf(stream, "  -%c", sopt); \
 			if (((char *)lopt)[0] != '\0') \
@@ -449,12 +462,13 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 	if (id == xap_derive_id(sopt, lopt)) return disp;
 
 #define xap_define_fprint_help(name, arguments, display_hints) \
-	char * xap_get_desc(int id) \
+	char * xap_get_desc_ ## name(int id) \
 	{ \
 		display_hints(xap_derive_return_desc) \
 		return NULL; \
 	} \
-	char * xap_get_disp(int id) \
+	\
+	char * xap_get_disp_ ## name(int id) \
 	{ \
 		display_hints(xap_derive_return_disp) \
 		return NULL; \
@@ -463,6 +477,8 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 	xap_declare_fprint_usage(name) \
 	{ \
 		int cnt = 0; \
+		char * (*get_desc)(int) = xap_get_desc_ ## name; \
+		char * (*get_disp)(int) = xap_get_disp_ ## name; \
 		cnt += fputs("\npositional arguments:\n", stream); \
 		arguments(xap_derive_fprint_positional_help) \
 		cnt += fputs("\nkeyword arguments:\n", stream); \
