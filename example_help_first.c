@@ -24,8 +24,9 @@ xap_define_repeat(xap_int_4, int, xap_int, 4);
 	_('h', "help"   ) \
 
 #define hints(_) \
-	_( 0 , NULL, "example-program", XAP_NO_HELP     ) \
-	_( 1 , NULL, "int"            , "a whole number") \
+	_( 0 ,  NULL , "example-program", XAP_NO_HELP      ) \
+	_( 1 ,  NULL , "int"            , "a whole number" ) \
+	_('h', "help", ""               , "print this help")
 
 struct args xap_struct(args);
 
