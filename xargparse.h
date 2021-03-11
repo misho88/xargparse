@@ -448,7 +448,8 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 				n += fprintf(stream, ", --%s  ", (char *)lopt); \
 			else \
 				n += fputs("  ", stream); \
-			n += fprintf(stream, "%s", disp); \
+			if (disp) \
+				n += fprintf(stream, "%s", disp); \
 			cnt += n; \
 			cnt += n >= 23 ? fprintf(stream, "\n%*.*s", 23, 23, "") : fprintf(stream, "%*.*s", 23 - n, 23 - n, ""); \
 			cnt += fprintf(stream, "%s\n", desc); \
@@ -465,7 +466,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 	char * xap_get_desc_ ## name(int id) \
 	{ \
 		display_hints(xap_derive_return_desc) \
-		return NULL; \
+		return "---"; \
 	} \
 	\
 	char * xap_get_disp_ ## name(int id) \
