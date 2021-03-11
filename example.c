@@ -23,7 +23,8 @@ xap_define_repeat(xap_int_4, int, xap_int, 4);
 	_('s', "string" , char const *, s      ,    , xap_string) \
 	_('t', "toggle" , bool        , t      ,    , xap_toggle) \
 	_('I', "4ints"  , int         , i4     , [4], xap_int_4 ) \
-	_( 1 , NULL     , int         , ip     ,    , xap_int   )
+	_( 1 , NULL     , int         , ip     ,    , xap_int   ) \
+	_( 3 , NULL     , char const *, sp     ,    , xap_string)
 
 /* arguments that stops the parsing early
  *
@@ -96,8 +97,8 @@ int main(int argc, char ** argv)
 	else {
 		printf(
 			"SUCCESSFULLY PARSED:\n"
-			"0:%s -h:%d -v:%d -i:%d -s:%s -t:%d -I:%d,%d,%d,%d, 1:%d\n",
-			args.program, args.help, args.version, args.i, args.s, args.t, args.i4[0], args.i4[1], args.i4[2], args.i4[3], args.ip
+			"0:%s -h:%d -v:%d -i:%d -s:%s -t:%d -I:%d,%d,%d,%d, 1:%d, 3:%s\n",
+			args.program, args.help, args.version, args.i, args.s, args.t, args.i4[0], args.i4[1], args.i4[2], args.i4[3], args.ip, args.sp
 		);
 		if (argc) {
 			printf("AND DID NOT PARSE:\n");
