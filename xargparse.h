@@ -213,7 +213,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 	bool dirty = false; \
 	int i = -1, position = 0; \
 	int consumed; \
-	char * equal_sign; \
+	char * equal_sign = NULL; \
 	size_t lopt_len; \
 	int id, ids[] = xap_ids(arguments); \
 	size_t n_ids = xap_count(arguments); \
