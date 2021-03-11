@@ -208,9 +208,6 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 
 
 /* parsing states */
-#define xap_derive_stop_after_logic(sopt, lopt) \
-	if (id == xap_derive_id(sopt, lopt)) return ctx;
-
 #define xap_derive_state_set_arg(sopt, lopt, type, name, arry, conv) \
 	case xap_derive_state_name(sopt, lopt, type, name, arry, conv): \
 		id = xap_derive_id(sopt, lopt); \
@@ -230,7 +227,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 			if (ctx.error) return ctx; \
 		} \
 		ids[xap_find_int(n_ids, ids, id)] = XAP_ALREADY_PARSED; \
-		stop_after(xap_derive_stop_after_logic) \
+		if (get_stop_after(xap_derive_id(sopt, lopt))) return ctx; \
 		state = NEXT_ARG; \
 	break;
 #define xap_states_set_arg_X(arguments) \
@@ -362,9 +359,18 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 #define xap_declare_parser(name, struct_type) \
 	xap_error_context_t name(int * argc, char ** argv, struct_type * args)
 
+#define xap_derive_return_stop_after(sopt, lopt) \
+	if (id == xap_derive_id(sopt, lopt)) return true;
+
 #define xap_define_parser(name, struct_type, arguments, stop_after, required) \
+	bool xap_get_stop_after_ ## name(int id) \
+	{ \
+		stop_after(xap_derive_return_stop_after) \
+		return false; \
+	} \
 	xap_declare_parser(name, struct_type) \
 	{ \
+		bool (*get_stop_after)(int) = xap_get_stop_after_ ## name; \
 		xap_parser_vars(arguments, stop_after, required); \
 		xap_parser_fsm(arguments, required); \
 		return ctx; \
