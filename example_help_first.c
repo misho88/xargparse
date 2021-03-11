@@ -17,9 +17,6 @@
 	_( 0 , NULL ) \
 	_( 1 , NULL ) \
 
-#define stop_after(_) \
-	_('h', "help"   ) \
-
 #define hints(_) \
 	_( 0 ,  NULL , "example-program", XAP_NO_HELP      ) \
 	_( 1 ,  NULL , "int"            , "a whole number" ) \
