@@ -1,8 +1,5 @@
 #include "xargparse.h"
 
-/* define a function that applies xap_int to each element of a 4-element array */
-xap_define_repeat(xap_int_4, int, xap_int, 4);
-
 #define empty(_)
 
 #define args0(_) \
