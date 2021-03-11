@@ -247,7 +247,9 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 		if (argv[i][0] != '-') { state = SOPT; break; } /* x in -xyz */ \
 		argv[i]++; \
 		if (argv[i][0] != '\0') { state = LOPT; break; } /* arg in --arg */ \
-		state = CHECK; /* "--" means do not touch other arguments */ \
+		/* "--" means do not touch other arguments */ \
+		argv[i] = ctx.argument; \
+		state = CHECK; \
 	break;
 
 #define xap_derive_sopt_test(sopt, lopt, type, name, arry, conv) \
