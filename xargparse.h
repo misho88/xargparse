@@ -24,6 +24,13 @@
 typedef char const * xap_error_t;
 typedef xap_error_t (*xap_assign)(int, char **, void *, int *);
 
+#if defined(__clang__)
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 static inline
 xap_error_t xap_toggle(int argc, char ** argv, bool * target, int * consumed)
@@ -32,6 +39,12 @@ xap_error_t xap_toggle(int argc, char ** argv, bool * target, int * consumed)
 	*consumed = 0;
 	return NULL;
 }
+
+#if defined(__clang__)
+	#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+	#pragma GCC diagnostic pop
+#endif
 
 static inline
 xap_error_t xap_string(int argc, char ** argv, char const ** target, int * consumed)
@@ -288,7 +301,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 #define xap_state_lopt(arguments) \
 	case LOPT: \
 		equal_sign = strchr(argv[i], '='); \
-		lopt_len = equal_sign != NULL ? equal_sign - argv[i] : strlen(argv[i]); \
+		lopt_len = equal_sign != NULL ? (size_t)(equal_sign - argv[i]) : strlen(argv[i]); \
 		if (0) { } \
 		arguments(xap_derive_lopt_test) \
 		else { \
