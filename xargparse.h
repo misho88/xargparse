@@ -239,7 +239,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 		if (*argc == i) { state = CHECK; break; } /* no more arguments */ \
 		if (i < 0) i = 0; \
 		equal_sign = NULL; \
-		ctx.argument = argv[0]; \
+		ctx.argument = argv[i]; \
 		ctx.n_parameters = 0; \
 		dirty = false; \
 		if (argv[i][0] != '-' || argv[i][1] == '\0') { state = POSITIONAL; break; } /* not a keyword */ \
@@ -259,8 +259,10 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 		if (0) { } \
 		arguments(xap_derive_sopt_test) \
 		else { \
-			ctx.error = "unrecognized argument"; \
-			return ctx; \
+			argv[i] = ctx.argument; \
+			i++; \
+			state = NEXT_ARG; \
+			break; \
 		} \
 		argv[i]++; \
 		dirty = argv[i][0] != '\0'; \
@@ -288,8 +290,10 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 		if (0) { } \
 		arguments(xap_derive_lopt_test) \
 		else { \
-			ctx.error = "unknown argument"; \
-			return ctx; \
+			argv[i] = ctx.argument; \
+			i++; \
+			state = NEXT_ARG; \
+			break; \
 		} \
 	break;
 
@@ -304,6 +308,7 @@ ssize_t xap_find_int(size_t size, int * array, int item)
 		else { \
 			i++; \
 			state = NEXT_ARG; \
+			break; \
 		} \
 		position++; \
 	break;

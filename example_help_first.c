@@ -53,6 +53,15 @@ int main(int argc, char ** argv)
 		fprint_usage(stderr);
 		return 1;
 	}
+
+	if (argc) {
+		fputs("unknown arguments: ", stderr);
+		xap_fprint_args(argc, argv, stderr);
+		fprint_usage(stderr);
+		return 1;
+	}
+
 	printf("integer is %d\n", args.i);
+
 	return 0;
 }
